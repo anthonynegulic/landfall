@@ -18,8 +18,8 @@ const defaultValues = {
 
 function Nav() {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-ink h-[52px] px-6 md:px-10 flex items-center">
-      <a href="/" className="font-display text-lg text-white tracking-widest">
+    <nav className="sticky top-0 z-50 bg-ink h-[52px] flex items-center px-page">
+      <a href="/" className="font-display font-normal text-lg text-white tracking-[0.08em]">
         LAND<span className="text-teal">FALL</span>
       </a>
     </nav>
@@ -112,38 +112,44 @@ export default function App() {
     <div className="min-h-screen bg-cream">
       <Nav />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-[72px] pb-10 md:pt-[92px] md:pb-16">
+      <div className="max-w-[1080px] mx-auto px-page pb-10 md:pb-16">
         {/* Hero */}
-        <header className="text-center mb-10 md:mb-14">
-          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-light text-ink leading-tight mb-4">
+        <header className="text-center pt-12 mb-12 md:pt-16 md:mb-16">
+          <h1
+            className="font-display font-light text-ink leading-tight mb-4"
+            style={{ fontSize: 'clamp(2.4rem, 5vw, 3.8rem)' }}
+          >
             Can your family afford to move abroad?
           </h1>
-          <p className="font-body text-base md:text-lg text-slate max-w-2xl mx-auto leading-relaxed">
+          <p
+            className="font-body font-normal text-slate mx-auto"
+            style={{ fontSize: 'clamp(1rem, 2.5vw, 1.15rem)', lineHeight: '1.75', maxWidth: '620px' }}
+          >
             Enter your savings, costs, and expected income. See exactly how many months of financial runway you have.
           </p>
         </header>
 
         {/* Main layout */}
-        <div className="grid grid-cols-1 md:grid-cols-[380px_1fr] gap-8 md:gap-10 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-8 lg:gap-10 items-start">
           {/* Input form */}
           <div>
             <InputSection values={values} onChange={setValues} />
           </div>
 
           {/* Output panel */}
-          <div>
+          <div className="lg:sticky lg:top-8">
             {data ? (
               <div className="space-y-6">
                 <HeadlineNumber data={data} monthlyIncome={Number(values.monthlyIncome) || 0} shortfall={shortfall} />
                 {data.length >= 2 && (
-                  <div className="bg-sand rounded-2xl border border-mist p-4 md:p-6">
+                  <div className="bg-sand rounded-xl border border-mist p-4 md:p-6">
                     <RunwayChart data={data} incomeStartMonth={incomeStartMonth} />
                   </div>
                 )}
                 <SummaryCards data={data} />
               </div>
             ) : (
-              <div className="flex items-center justify-center h-64 bg-sand/50 rounded-2xl border border-mist">
+              <div className="flex items-center justify-center h-64 bg-sand/50 rounded-xl border border-mist">
                 <p className="text-slate text-center px-6">
                   Enter your savings and monthly rent to see your runway.
                 </p>
@@ -157,9 +163,9 @@ export default function App() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-ink py-8 px-6 md:px-10">
-        <div className="max-w-5xl mx-auto md:flex md:items-center md:justify-between">
-          <div className="font-display text-lg text-white tracking-widest mb-4 md:mb-0">
+      <footer className="bg-ink py-8 px-page">
+        <div className="max-w-[1080px] mx-auto md:flex md:items-center md:justify-between">
+          <div className="font-display font-normal text-lg text-white tracking-[0.08em] mb-4 md:mb-0">
             LAND<span className="text-teal">FALL</span>
           </div>
           <div className="text-[0.75rem] text-white/25 max-w-lg md:text-right leading-relaxed">

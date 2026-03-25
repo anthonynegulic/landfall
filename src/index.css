@@ -23,3 +23,8 @@ body {
   background-color: var(--color-cream);
   margin: 0;
 }
+
+.px-page {
+  padding-left: clamp(1rem, 5vw, 2.5rem);
+  padding-right: clamp(1rem, 5vw, 2.5rem);
+}

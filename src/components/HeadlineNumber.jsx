@@ -1,5 +1,17 @@
 import { getRunwayMonths, getBreakevenMonth } from '../utils/calculations';
 
+// Wraps standalone digit sequences (including trailing +) in <em> for italic styling
+function WithItalicNumber({ text }) {
+  const parts = text.split(/(\d+\+?)/);
+  return (
+    <>
+      {parts.map((part, i) =>
+        /^\d+\+?$/.test(part) ? <em key={i}>{part}</em> : part
+      )}
+    </>
+  );
+}
+
 export default function HeadlineNumber({ data, monthlyIncome = 0, shortfall = 0 }) {
   if (!data || data.length === 0) return null;
 
@@ -8,7 +20,10 @@ export default function HeadlineNumber({ data, monthlyIncome = 0, shortfall = 0 
     const formatted = '$' + shortfall.toLocaleString('en-AU');
     return (
       <div className="text-center py-6">
-        <p className="font-display text-2xl md:text-3xl font-light leading-snug text-red">
+        <p
+          className="font-display font-light leading-snug text-red"
+          style={{ fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)' }}
+        >
           Your relocation costs exceed your savings. You'd need {formatted} more to start with a positive balance.
         </p>
       </div>
@@ -19,7 +34,6 @@ export default function HeadlineNumber({ data, monthlyIncome = 0, shortfall = 0 
   const breakeven = getBreakevenMonth(data);
   const balanceNeverZero = data[data.length - 1].balance > 0;
 
-  // Did income never actually appear in the data? (savings ran out before income started)
   const incomeNeverStarted = monthlyIncome > 0 && !data.some((d) => d.income > 0);
 
   let text = '';
@@ -50,8 +64,11 @@ export default function HeadlineNumber({ data, monthlyIncome = 0, shortfall = 0 
 
   return (
     <div className="text-center py-6">
-      <p className={`font-display text-2xl md:text-3xl font-light leading-snug ${colorClass}`}>
-        {text}
+      <p
+        className={`font-display font-light leading-snug ${colorClass}`}
+        style={{ fontSize: 'clamp(1.4rem, 3.5vw, 1.8rem)' }}
+      >
+        <WithItalicNumber text={text} />
       </p>
     </div>
   );
