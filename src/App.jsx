@@ -95,12 +95,18 @@ export default function App() {
       healthInsurance: Number(values.healthInsurance) || 0,
       livingExpenses: Number(values.livingExpenses) || 0,
       monthlyIncome: Number(values.monthlyIncome) || 0,
-      monthsUntilIncome: Number(values.monthsUntilIncome) || 1,
+      monthsUntilIncome: values.monthsUntilIncome !== '' ? Number(values.monthsUntilIncome) : 1,
     });
   }, [values]);
 
   const incomeStartMonth =
-    Number(values.monthlyIncome) > 0 ? (Number(values.monthsUntilIncome) || 1) + 1 : 0;
+    Number(values.monthlyIncome) > 0 ? (values.monthsUntilIncome !== '' ? Number(values.monthsUntilIncome) : 1) + 1 : 0;
+
+  const shortfall = (() => {
+    const s = Number(values.savings) || 0;
+    const r = Number(values.relocationCosts) || 0;
+    return s > 0 ? Math.max(0, r - s) : 0;
+  })();
 
   return (
     <div className="min-h-screen bg-cream">
@@ -128,10 +134,12 @@ export default function App() {
           <div>
             {data ? (
               <div className="space-y-6">
-                <HeadlineNumber data={data} />
-                <div className="bg-sand rounded-2xl border border-mist p-4 md:p-6">
-                  <RunwayChart data={data} incomeStartMonth={incomeStartMonth} />
-                </div>
+                <HeadlineNumber data={data} monthlyIncome={Number(values.monthlyIncome) || 0} shortfall={shortfall} />
+                {data.length >= 2 && (
+                  <div className="bg-sand rounded-2xl border border-mist p-4 md:p-6">
+                    <RunwayChart data={data} incomeStartMonth={incomeStartMonth} />
+                  </div>
+                )}
                 <SummaryCards data={data} />
               </div>
             ) : (

@@ -9,6 +9,43 @@ import {
 } from 'recharts';
 import { getBreakevenMonth } from '../utils/calculations';
 
+const GREEN = '#0D9488';
+const AMBER = '#D97706';
+const RED   = '#DC2626';
+
+// Build gradient stops that change colour whenever the balance zone changes.
+// Two coincident stops at each transition point give a sharp edge, not a blend.
+function buildGradientStops(data, startingBalance) {
+  const n = data.length - 1;
+  if (n <= 0) return [{ pct: '0%', color: GREEN }];
+
+  const zone = (d) => {
+    const ratio = startingBalance > 0 ? d.balance / startingBalance : 0;
+    if (ratio > 0.5) return GREEN;
+    if (ratio > 0.2) return AMBER;
+    return RED;
+  };
+
+  const pct = (i) => `${((i / n) * 100).toFixed(2)}%`;
+  const stops = [{ pct: pct(0), color: zone(data[0]) }];
+
+  for (let i = 1; i < data.length; i++) {
+    const prev = zone(data[i - 1]);
+    const curr = zone(data[i]);
+    if (curr !== prev) {
+      stops.push({ pct: pct(i), color: prev }); // end of previous zone
+      stops.push({ pct: pct(i), color: curr });  // start of new zone
+    }
+  }
+
+  const last = stops[stops.length - 1];
+  if (last.pct !== '100.00%') {
+    stops.push({ pct: '100%', color: zone(data[data.length - 1]) });
+  }
+
+  return stops;
+}
+
 function formatAUD(value) {
   if (value >= 1000) return `$${(value / 1000).toFixed(0)}k`;
   return `$${value}`;
@@ -58,20 +95,7 @@ export default function RunwayChart({ data, incomeStartMonth }) {
   const startingBalance = data[0].balance;
   const breakeven = getBreakevenMonth(data);
 
-  // Determine color zones
-  const chartData = data.map((d) => {
-    const ratio = startingBalance > 0 ? d.balance / startingBalance : 0;
-    let fill;
-    if (ratio > 0.5) fill = '#0D9488';
-    else if (ratio > 0.2) fill = '#D97706';
-    else fill = '#DC2626';
-    return { ...d, fill };
-  });
-
-  const lastRatio = startingBalance > 0
-    ? chartData[chartData.length - 1].balance / startingBalance
-    : 0;
-  const areaColor = lastRatio > 0.5 ? '#0D9488' : lastRatio > 0.2 ? '#D97706' : '#DC2626';
+  const stops = buildGradientStops(data, startingBalance);
 
   // Reference line collision logic
   const incMonth = (incomeStartMonth > 0 && incomeStartMonth < data.length) ? incomeStartMonth : null;
@@ -83,11 +107,17 @@ export default function RunwayChart({ data, incomeStartMonth }) {
   return (
     <div className="w-full min-h-[280px] md:min-h-[400px] px-1">
       <ResponsiveContainer width="100%" height={400}>
-        <AreaChart data={chartData} margin={{ top: 24, right: 16, left: 10, bottom: 0 }}>
+        <AreaChart data={data} margin={{ top: 24, right: 16, left: 10, bottom: 0 }}>
           <defs>
-            <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={areaColor} stopOpacity={0.3} />
-              <stop offset="100%" stopColor={areaColor} stopOpacity={0.05} />
+            <linearGradient id="fillGradient" x1="0" y1="0" x2="1" y2="0">
+              {stops.map((s, i) => (
+                <stop key={i} offset={s.pct} stopColor={s.color} stopOpacity={0.22} />
+              ))}
+            </linearGradient>
+            <linearGradient id="strokeGradient" x1="0" y1="0" x2="1" y2="0">
+              {stops.map((s, i) => (
+                <stop key={i} offset={s.pct} stopColor={s.color} stopOpacity={1} />
+              ))}
             </linearGradient>
           </defs>
           <XAxis
@@ -140,9 +170,10 @@ export default function RunwayChart({ data, incomeStartMonth }) {
           <Area
             type="monotone"
             dataKey="balance"
-            stroke={areaColor}
+            stroke="url(#strokeGradient)"
             strokeWidth={2}
-            fill="url(#balanceGradient)"
+            fill="url(#fillGradient)"
+            fillOpacity={1}
           />
         </AreaChart>
       </ResponsiveContainer>

@@ -123,6 +123,7 @@ function Section({ title, defaultOpen = true, children }) {
 export default function InputSection({ values, onChange }) {
   const update = (field) => (val) => onChange({ ...values, [field]: val });
   const [employerCoversSchool, setEmployerCoversSchool] = useState(false);
+  const savedSchoolFees = useRef(values.schoolFees);
 
   return (
     <div>
@@ -160,8 +161,14 @@ export default function InputSection({ values, onChange }) {
                 role="switch"
                 aria-checked={employerCoversSchool}
                 onClick={() => {
-                  setEmployerCoversSchool(!employerCoversSchool);
-                  if (!employerCoversSchool) update('schoolFees')(0);
+                  const next = !employerCoversSchool;
+                  setEmployerCoversSchool(next);
+                  if (next) {
+                    savedSchoolFees.current = values.schoolFees;
+                    update('schoolFees')(0);
+                  } else {
+                    update('schoolFees')(savedSchoolFees.current);
+                  }
                 }}
                 className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
                   ${employerCoversSchool ? 'bg-teal' : 'bg-mist'}`}

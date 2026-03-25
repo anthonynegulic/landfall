@@ -25,7 +25,7 @@ export function calculateRunway({
 
   for (let m = 1; m <= 36; m++) {
     const prev = data[m - 1];
-    const incomeForMonth = m > monthsUntilIncome ? monthlyIncome : 0;
+    const incomeForMonth = m >= monthsUntilIncome ? monthlyIncome : 0;
     const balance = Math.round(prev.balance - totalMonthlyExpenses + incomeForMonth);
 
     if (balance <= 0) {

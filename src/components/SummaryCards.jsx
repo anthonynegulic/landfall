@@ -14,7 +14,7 @@ function formatCurrency(n) {
 }
 
 export default function SummaryCards({ data }) {
-  if (!data || data.length < 2) return null;
+  if (!data || data.length === 0) return null;
 
   const monthlyBurn = data[1]?.expenses || 0;
   const runway = getRunwayMonths(data);
