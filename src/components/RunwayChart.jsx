@@ -123,19 +123,19 @@ export default function RunwayChart({ data, incomeStartMonth }) {
           <XAxis
             dataKey="month"
             tickFormatter={(m) => (m === 0 ? 'Arrival' : `M${m}`)}
-            tick={{ fontSize: 12, fill: '#64748B' }}
+            tick={{ fontSize: 12, fill: '#64748B', fontFamily: 'DM Sans, sans-serif', fontWeight: 400 }}
             axisLine={{ stroke: '#EDE7D8' }}
             tickLine={false}
           />
           <YAxis
             tickFormatter={formatAUD}
-            tick={{ fontSize: 12, fill: '#64748B' }}
+            tick={{ fontSize: 12, fill: '#64748B', fontFamily: 'DM Sans, sans-serif', fontWeight: 400 }}
             axisLine={false}
             tickLine={false}
-            width={48}
+            width={52}
           />
           <Tooltip content={<CustomTooltip />} />
-          <ReferenceLine y={0} stroke="#DC2626" strokeDasharray="4 4" strokeOpacity={0.5} />
+          <ReferenceLine y={0} stroke="#EDE7D8" strokeDasharray="4 4" strokeWidth={1} />
 
           {/* Combined label when lines are ≤1 month apart */}
           {combinedLabel && breakeven !== null && incMonth !== null && (
