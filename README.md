@@ -1,16 +1,29 @@
-# React + Vite
+# Landfall
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A relocation runway calculator for families moving internationally. Enter your savings, costs, and expected income to see exactly how many months of financial runway you have.
 
-Currently, two official plugins are available:
+Built with React + Vite + Recharts.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Development
 
-## React Compiler
+```bash
+npm install
+npm run dev
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Build
 
-## Expanding the ESLint configuration
+```bash
+npm run build
+npm run preview
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Custom Domain
+
+To connect a custom domain (e.g., landfall.app):
+
+1. Go to your Vercel project settings → **Domains**
+2. Add your domain and follow the instructions
+3. Update DNS records as directed by Vercel (usually an A record or CNAME)
+4. Update the `og:url` meta tag in `index.html` to match your custom domain
+5. Wait for DNS propagation (typically 5–30 minutes)

@@ -28,3 +28,34 @@ body {
   padding-left: clamp(1rem, 5vw, 2.5rem);
   padding-right: clamp(1rem, 5vw, 2.5rem);
 }
+
+/* Chart entrance — plays once when the chart first mounts */
+@keyframes chartEntrance {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.chart-entrance {
+  animation: chartEntrance 400ms ease-out forwards;
+}
+
+/* Summary card entrance — staggered via inline animation-delay */
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card-entrance {
+  animation: cardEntrance 300ms ease-out forwards;
+  opacity: 0; /* start invisible; animation fills to 1 */
+}

@@ -79,13 +79,25 @@ function HowItWorks() {
   );
 }
 
+// Derive the appropriate empty-state message based on what the user has entered.
+// Returns null when data is available and no message is needed.
+function getEmptyMessage(values) {
+  if (values.savings === '') return 'Enter your savings to see your runway.';
+  if (values.monthlyRent === '') return 'Add your monthly rent to get started.';
+  if (Number(values.monthlyRent) === 0) return 'Add your monthly rent to get started.';
+  return null;
+}
+
 export default function App() {
   const [values, setValues] = useState(defaultValues);
 
   const data = useMemo(() => {
-    const s = Number(values.savings) || 0;
-    const r = Number(values.monthlyRent) || 0;
-    if (s <= 0 || r <= 0) return null;
+    // Require both savings and rent to be explicitly entered
+    if (values.savings === '' || values.monthlyRent === '') return null;
+    const r = Number(values.monthlyRent);
+    if (r <= 0) return null;
+
+    const s = Number(values.savings);
 
     return calculateRunway({
       savings: s,
@@ -102,80 +114,83 @@ export default function App() {
   const incomeStartMonth =
     Number(values.monthlyIncome) > 0 ? (values.monthsUntilIncome !== '' ? Number(values.monthsUntilIncome) : 1) + 1 : 0;
 
+  // Shortfall is valid whenever savings has been explicitly entered (including 0)
   const shortfall = (() => {
-    const s = Number(values.savings) || 0;
+    if (values.savings === '') return 0;
+    const s = Number(values.savings);
     const r = Number(values.relocationCosts) || 0;
-    return s > 0 ? Math.max(0, r - s) : 0;
+    return Math.max(0, r - s);
   })();
+
+  const emptyMessage = getEmptyMessage(values);
 
   return (
     <div className="min-h-screen bg-cream">
       <Nav />
 
-      <div className="max-w-[1080px] mx-auto px-page pb-10 md:pb-16">
-        {/* Hero */}
-        <header className="text-center pt-12 mb-12 md:pt-16 md:mb-16">
-          <h1
-            className="font-display font-light text-ink leading-tight mb-4"
-            style={{ fontSize: 'clamp(2.4rem, 5vw, 3.8rem)' }}
-          >
-            Can your family afford to move abroad?
-          </h1>
-          <p
-            className="font-body font-normal text-slate mx-auto"
-            style={{ fontSize: 'clamp(1rem, 2.5vw, 1.15rem)', lineHeight: '1.75', maxWidth: '620px' }}
-          >
-            Enter your savings, costs, and expected income. See exactly how many months of financial runway you have.
-          </p>
-        </header>
+      <main>
+        <div className="max-w-[1080px] mx-auto px-page pb-10 md:pb-16">
+          {/* Hero */}
+          <header className="text-center pt-12 mb-12 md:pt-16 md:mb-16" style={{ minHeight: '160px' }}>
+            <h1
+              className="font-display font-light text-ink leading-tight mb-4"
+              style={{ fontSize: 'clamp(2.4rem, 5vw, 3.8rem)' }}
+            >
+              Can your family afford to move abroad?
+            </h1>
+            <p
+              className="font-body font-normal text-slate mx-auto"
+              style={{ fontSize: 'clamp(1rem, 2.5vw, 1.15rem)', lineHeight: '1.75', maxWidth: '620px' }}
+            >
+              Enter your savings, costs, and expected income. See exactly how many months of financial runway you have.
+            </p>
+          </header>
 
-        {/* Main layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-8 lg:gap-10 items-start">
-          {/* Input form */}
-          <div>
-            <InputSection values={values} onChange={setValues} />
+          {/* Main layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-8 lg:gap-10 items-start">
+            {/* Input form */}
+            <div>
+              <InputSection values={values} onChange={setValues} />
+            </div>
+
+            {/* Output panel */}
+            <div className="lg:sticky lg:top-8">
+              {data ? (
+                <div className="space-y-6">
+                  <HeadlineNumber data={data} monthlyIncome={Number(values.monthlyIncome) || 0} shortfall={shortfall} />
+                  {data.length >= 2 && (
+                    <div className="bg-sand rounded-xl border border-mist p-4 md:p-6 chart-entrance"
+                         aria-label="Runway chart showing month-by-month cash balance after relocation."
+                         role="img">
+                      <RunwayChart data={data} incomeStartMonth={incomeStartMonth} />
+                    </div>
+                  )}
+                  <SummaryCards data={data} />
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-64 bg-sand/50 rounded-xl border border-mist">
+                  <p className="font-body text-slate text-center px-6">
+                    {emptyMessage || 'Enter your savings and monthly rent to see your runway.'}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Output panel */}
-          <div className="lg:sticky lg:top-8">
-            {data ? (
-              <div className="space-y-6">
-                <HeadlineNumber data={data} monthlyIncome={Number(values.monthlyIncome) || 0} shortfall={shortfall} />
-                {data.length >= 2 && (
-                  <div className="bg-sand rounded-xl border border-mist p-4 md:p-6">
-                    <RunwayChart data={data} incomeStartMonth={incomeStartMonth} />
-                  </div>
-                )}
-                <SummaryCards data={data} />
-              </div>
-            ) : (
-              <div className="flex items-center justify-center h-64 bg-sand/50 rounded-xl border border-mist">
-                <p className="text-slate text-center px-6">
-                  Enter your savings and monthly rent to see your runway.
-                </p>
-              </div>
-            )}
-          </div>
+          {/* How It Works */}
+          <HowItWorks />
         </div>
-
-        {/* How It Works */}
-        <HowItWorks />
-      </div>
+      </main>
 
       {/* Footer */}
-      <footer className="bg-ink py-8 px-page">
-        <div className="max-w-[1080px] mx-auto md:flex md:items-center md:justify-between">
-          <div className="font-display font-normal text-lg text-white tracking-[0.08em] mb-4 md:mb-0">
+      <footer className="bg-ink py-6 px-page">
+        <div className="max-w-[1080px] mx-auto flex items-center justify-between">
+          <div className="font-display font-normal text-lg text-white tracking-[0.08em]">
             LAND<span className="text-teal">FALL</span>
           </div>
-          <div className="text-[0.75rem] text-white/25 max-w-lg md:text-right leading-relaxed">
-            <p className="mb-2">
-              Landfall is a planning tool, not financial advice. The numbers here are based entirely on what you
-              enter — they don't account for inflation, tax obligations, exchange rate movements, or the
-              unexpected. Before making any major financial decision, speak with a qualified financial adviser.
-            </p>
-            <p>All calculations run locally in your browser. We don't collect or store your data.</p>
-          </div>
+          <p className="font-body text-[0.72rem]" style={{ color: 'rgba(255,255,255,0.25)' }}>
+            Built in Melbourne
+          </p>
         </div>
       </footer>
     </div>
