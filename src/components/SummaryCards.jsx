@@ -1,8 +1,11 @@
 import { getRunwayMonths, getBreakevenMonth } from '../utils/calculations';
 
-function Card({ label, value }) {
+function Card({ label, value, animationDelay }) {
   return (
-    <div className="bg-sand rounded-xl px-5 py-5 text-center border border-mist">
+    <div
+      className="bg-sand rounded-xl px-5 py-5 text-center border border-mist card-entrance"
+      style={{ animationDelay }}
+    >
       <p className="font-body font-medium text-[0.72rem] uppercase tracking-[0.1em] text-slate mb-1">{label}</p>
       <p
         className="font-display font-light text-ink"
@@ -19,7 +22,8 @@ function formatCurrency(n) {
 }
 
 export default function SummaryCards({ data }) {
-  if (!data || data.length === 0) return null;
+  // Require at least 2 data points (month 0 + at least one month)
+  if (!data || data.length < 2) return null;
 
   const monthlyBurn = data[1]?.expenses || 0;
   const runway = getRunwayMonths(data);
@@ -31,9 +35,9 @@ export default function SummaryCards({ data }) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-      <Card label="Monthly burn" value={`${formatCurrency(monthlyBurn)}/mo`} />
-      <Card label="Runway" value={runwayDisplay} />
-      <Card label="Breakeven" value={breakeven ? `Month ${breakeven}` : 'No breakeven'} />
+      <Card label="Monthly burn" value={`${formatCurrency(monthlyBurn)}/mo`} animationDelay="0ms" />
+      <Card label="Runway" value={runwayDisplay} animationDelay="100ms" />
+      <Card label="Breakeven" value={breakeven ? `Month ${breakeven}` : 'No breakeven'} animationDelay="200ms" />
     </div>
   );
 }
